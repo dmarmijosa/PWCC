@@ -204,6 +204,7 @@
           <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Número:</span><span class="text-on-surface font-semibold">{{ datosBancarios().numero }}</span></div>
           <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Titular:</span><span class="text-on-surface font-semibold">{{ datosBancarios().titular }}</span></div>
           <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">RUC:</span><span class="text-on-surface font-semibold">{{ datosBancarios().ruc }}</span></div>
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Email Donaciones:</span><span class="text-on-surface font-semibold">{{ datosBancarios().email }}</span></div>
         </div>
 
         <button 
@@ -398,6 +399,21 @@
               required>
             @if (bankForm.get('ruc')?.touched && bankForm.get('ruc')?.invalid) {
               <span class="text-xs text-error block">El RUC es requerido.</span>
+            }
+          </div>
+
+          <!-- Email Donaciones -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_email">Correo Donaciones</label>
+            <input 
+              formControlName="email"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_email" 
+              placeholder="Ej. donaciones@confraternidad.org.ec" 
+              type="email"
+              required>
+            @if (bankForm.get('email')?.touched && bankForm.get('email')?.invalid) {
+              <span class="text-xs text-error block">Ingrese un correo de donaciones válido.</span>
             }
           </div>
 

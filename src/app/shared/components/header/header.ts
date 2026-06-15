@@ -1,6 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
+import { DataService } from '../../../core/services/data.service';
 
 @Component({
   selector: 'app-header',
@@ -51,7 +52,7 @@ import { NgOptimizedImage } from '@angular/common';
       <!-- Right: Buttons -->
       <div class="hidden lg:flex items-center gap-4">
         <button 
-          (click)="scrollToDonations()"
+          (click)="openDonationLink()"
           class="px-6 py-2 bg-primary-container text-on-primary-container font-label-md text-label-md rounded shadow-sm hover:brightness-90 transition-all font-semibold cursor-pointer">
           Donar
         </button>
@@ -91,7 +92,7 @@ import { NgOptimizedImage } from '@angular/common';
 
           <div class="flex flex-col gap-4 mt-2">
             <button 
-              (click)="scrollToDonations(); closeMobileMenu()"
+              (click)="openDonationLink(); closeMobileMenu()"
               class="w-full py-3 bg-primary-container text-on-primary-container font-label-md text-label-md rounded hover:brightness-90 transition-all font-semibold">
               Donar
             </button>
@@ -99,10 +100,12 @@ import { NgOptimizedImage } from '@angular/common';
         </div>
       }
     </nav>
-  `
+  `,
+  styles: []
 })
 export class HeaderComponent {
   private readonly router = inject(Router);
+  private readonly dataService = inject(DataService);
 
   protected readonly isMobileMenuOpen = signal(false);
 
@@ -114,14 +117,12 @@ export class HeaderComponent {
     this.isMobileMenuOpen.set(false);
   }
 
-  scrollToDonations(): void {
-    this.router.navigate(['/']).then(() => {
-      setTimeout(() => {
-        const element = document.getElementById('voluntariado');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    });
+  openDonationLink(): void {
+    if (typeof window !== 'undefined') {
+      const email = this.dataService.datosBancarios()?.email || 'donaciones@confraternidad.org.ec';
+      const subject = encodeURIComponent('Deseo realizar un donativo');
+      const body = encodeURIComponent('Hola, deseo realizar un donativo a la Confraternidad Carcelaria de Ecuador.');
+      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    }
   }
 }

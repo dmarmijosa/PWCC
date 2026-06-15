@@ -34,7 +34,8 @@ export class AdminDatosComponent {
     cuenta: ['', [Validators.required]],
     numero: ['', [Validators.required]],
     titular: ['', [Validators.required]],
-    ruc: ['', [Validators.required]]
+    ruc: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]]
   });
 
   // Expose reactive metrics from DataService
@@ -116,7 +117,8 @@ export class AdminDatosComponent {
         cuenta: val.cuenta || '',
         numero: val.numero || '',
         titular: val.titular || '',
-        ruc: val.ruc || ''
+        ruc: val.ruc || '',
+        email: val.email || ''
       });
       this.closeBankModal();
     }

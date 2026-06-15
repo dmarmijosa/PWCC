@@ -34,4 +34,5 @@ export interface DatosBancarios {
   numero: string;
   titular: string;
   ruc: string;
+  email: string;
 }

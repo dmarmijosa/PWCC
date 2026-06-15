@@ -18,7 +18,8 @@ export class DataService {
     cuenta: 'Corriente',
     numero: '2100XXXXXX',
     titular: 'Fund. Confraternidad Carcelaria',
-    ruc: '179XXXXXXX001'
+    ruc: '179XXXXXXX001',
+    email: 'donaciones@confraternidad.org.ec'
   };
 
   private readonly datosBancariosSignal = signal<DatosBancarios>(this.defaultDatosBancarios);
@@ -159,7 +160,8 @@ export class DataService {
             cuenta: data.cuenta,
             numero: data.numero,
             titular: data.titular,
-            ruc: data.ruc
+            ruc: data.ruc,
+            email: data.email || 'donaciones@confraternidad.org.ec'
           });
         }
       });
@@ -249,7 +251,8 @@ export class DataService {
       cuenta: datos.cuenta,
       numero: datos.numero,
       titular: datos.titular,
-      ruc: datos.ruc
+      ruc: datos.ruc,
+      email: datos.email
     }).then(({ error }) => {
       if (error) console.error('Error updating bank details in Supabase:', error);
     });
