@@ -1,0 +1,423 @@
+<div class="max-w-[container-max] mx-auto p-8 flex flex-col gap-8 w-full animate-fade-in-up">
+  <!-- Page Header -->
+  <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-background">Gestión de Datos</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1">Resumen general y administración de registros institucionales.</p>
+    </div>
+    <button 
+      (click)="openModal()"
+      class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity shadow-sm cursor-pointer font-semibold">
+      <span class="material-symbols-outlined">add</span>
+      Agregar Nuevo Registro
+    </button>
+  </header>
+
+  <!-- Metrics Cards Grid -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Metric 1 -->
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex justify-between items-start">
+        <div class="bg-secondary-container p-3 rounded-lg text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+        <span 
+          [class.bg-green-50]="growthPercentage() >= 0"
+          [class.text-green-700]="growthPercentage() >= 0"
+          [class.border-green-200]="growthPercentage() >= 0"
+          [class.bg-red-50]="growthPercentage() < 0"
+          [class.text-red-700]="growthPercentage() < 0"
+          [class.border-red-200]="growthPercentage() < 0"
+          class="font-label-md text-label-md px-2 py-1 rounded border text-xs font-semibold">
+          {{ growthPercentage() >= 0 ? '+' : '' }}{{ growthPercentage() }}% este mes
+        </span>
+      </div>
+      <div>
+        <p class="font-label-md text-label-md text-on-surface-variant text-sm font-medium">Total Donaciones (Confirmado)</p>
+        <p class="font-headline-lg text-headline-lg text-on-surface mt-1 font-bold">
+          ${{ totalDonado().toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+        </p>
+      </div>
+    </div>
+    <!-- Metric 2 -->
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex justify-between items-start">
+        <div class="bg-secondary-container p-3 rounded-lg text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined">group</span>
+        </div>
+        <span class="font-label-md text-label-md text-secondary bg-surface-variant px-2 py-1 rounded text-xs font-semibold">Activos</span>
+      </div>
+      <div>
+        <p class="font-label-md text-label-md text-on-surface-variant text-sm font-medium">Voluntarios Activos</p>
+        <p class="font-headline-lg text-headline-lg text-on-surface mt-1 font-bold">{{ activeVolunteersCount() }}</p>
+      </div>
+    </div>
+    <!-- Metric 3 -->
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex justify-between items-start">
+        <div class="bg-secondary-container p-3 rounded-lg text-on-secondary-container flex items-center justify-center">
+          <span class="material-symbols-outlined">assignment</span>
+        </div>
+        <span class="font-label-md text-label-md text-secondary bg-surface-variant px-2 py-1 rounded text-xs font-semibold">Estable</span>
+      </div>
+      <div>
+        <p class="font-label-md text-label-md text-on-surface-variant text-sm font-medium">Programas en Curso</p>
+        <p class="font-headline-lg text-headline-lg text-on-surface mt-1 font-bold">{{ programsCount() }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grid layout: Volunteers Table (2/3) & Bank Details (1/3) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
+    <!-- Left: Volunteers Section (2/3) -->
+    <section class="lg:col-span-2 flex flex-col gap-4">
+      <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+        <h3 class="font-headline-md text-headline-md text-on-background font-semibold">Gestión de Voluntarios</h3>
+        <div class="flex items-center gap-4 flex-wrap">
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input 
+              [value]="searchQuery()"
+              (input)="onSearchChange($event)"
+              class="pl-10 pr-4 py-2 border border-outline-variant rounded-lg bg-surface-container-lowest font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none w-64 transition-all" 
+              placeholder="Buscar voluntario...">
+          </div>
+          
+          <div class="flex gap-1 bg-surface-container-low p-1 rounded-lg">
+            <button 
+              (click)="onStatusFilterChange('all')"
+              [class.bg-white]="filterStatus() === 'all'"
+              [class.shadow-sm]="filterStatus() === 'all'"
+              class="px-3 py-1.5 rounded-md font-label-md text-xs font-semibold text-secondary transition-all cursor-pointer">
+              Todos
+            </button>
+            <button 
+              (click)="onStatusFilterChange('Activo')"
+              [class.bg-white]="filterStatus() === 'Activo'"
+              [class.shadow-sm]="filterStatus() === 'Activo'"
+              class="px-3 py-1.5 rounded-md font-label-md text-xs font-semibold text-secondary transition-all cursor-pointer">
+              Activos
+            </button>
+            <button 
+              (click)="onStatusFilterChange('Pendiente')"
+              [class.bg-white]="filterStatus() === 'Pendiente'"
+              [class.shadow-sm]="filterStatus() === 'Pendiente'"
+              class="px-3 py-1.5 rounded-md font-label-md text-xs font-semibold text-secondary transition-all cursor-pointer">
+              Pendientes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volunteers Table -->
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wider">
+                <th class="p-4 font-semibold border-b border-outline-variant/30">Nombre</th>
+                <th class="p-4 font-semibold border-b border-outline-variant/30">Ciudad</th>
+                <th class="p-4 font-semibold border-b border-outline-variant/30">Programa asignado</th>
+                <th class="p-4 font-semibold border-b border-outline-variant/30">Estado</th>
+                <th class="p-4 font-semibold text-right border-b border-outline-variant/30">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="font-body-md text-body-md text-on-surface divide-y divide-surface-variant">
+              @for (v of filteredVolunteers(); track v.id) {
+                <tr class="hover:bg-surface-container-low transition-colors even:bg-surface-bright odd:bg-surface-container-lowest animate-fade-in-up">
+                  <td class="p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden relative flex-shrink-0">
+                      <img 
+                        [src]="v.avatarUrl" 
+                        alt="Avatar" 
+                        class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                      <div class="font-medium text-secondary">{{ v.nombre }}</div>
+                      <div class="text-xs text-on-surface-variant">{{ v.email }}</div>
+                    </div>
+                  </td>
+                  <td class="p-4">{{ v.ciudad }}</td>
+                  <td class="p-4">{{ v.programaAsignado }}</td>
+                  <td class="p-4">
+                    @if (v.estado === 'Activo') {
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">
+                        Activo
+                      </span>
+                    } @else if (v.estado === 'Pendiente') {
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+                        Pendiente
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold">
+                        Inactivo
+                      </span>
+                    }
+                  </td>
+                  <td class="p-4 text-right flex items-center justify-end gap-2">
+                    <button 
+                      (click)="toggleVolunteerStatus(v)"
+                      [title]="v.estado === 'Activo' ? 'Inactivar Voluntario' : 'Activar/Aprobar Voluntario'"
+                      class="text-secondary hover:text-primary transition-colors p-1 cursor-pointer">
+                      <span class="material-symbols-outlined text-[20px]">
+                        {{ v.estado === 'Activo' ? 'block' : 'check_circle' }}
+                      </span>
+                    </button>
+                    <button 
+                      (click)="deleteVolunteer(v.id)"
+                      title="Eliminar Voluntario"
+                      class="text-error hover:text-red-700 transition-colors p-1 cursor-pointer">
+                      <span class="material-symbols-outlined text-[20px]">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="p-8 text-center text-on-surface-variant">
+                    No se encontraron voluntarios registrados.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Bank Details Card (1/3) -->
+    <section class="flex flex-col gap-4">
+      <h3 class="font-headline-md text-headline-md text-on-background font-semibold">Datos de la Cuenta</h3>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col gap-6 shadow-sm hover:shadow-md transition-all duration-300">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">account_balance</span>
+          </div>
+          <div>
+            <h4 class="font-headline-sm text-headline-sm text-secondary font-semibold">Información Bancaria</h4>
+            <p class="text-xs text-on-surface-variant">Donativos institucionales</p>
+          </div>
+        </div>
+
+        <div class="divide-y divide-outline-variant/30 text-sm space-y-1">
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Banco:</span><span class="text-on-surface font-semibold">{{ datosBancarios().banco }}</span></div>
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Cuenta:</span><span class="text-on-surface font-semibold">{{ datosBancarios().cuenta }}</span></div>
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Número:</span><span class="text-on-surface font-semibold">{{ datosBancarios().numero }}</span></div>
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">Titular:</span><span class="text-on-surface font-semibold">{{ datosBancarios().titular }}</span></div>
+          <div class="flex justify-between py-2.5"><span class="text-secondary font-medium">RUC:</span><span class="text-on-surface font-semibold">{{ datosBancarios().ruc }}</span></div>
+        </div>
+
+        <button 
+          (click)="openBankModal()"
+          class="w-full flex items-center justify-center gap-2 bg-secondary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:bg-secondary/95 transition-all font-semibold cursor-pointer shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">edit</span>
+          Editar Información
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Create Volunteer Modal -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-outline-variant/30 animate-scale-up">
+        <!-- Modal Header -->
+        <header class="bg-surface-container px-6 py-4 flex justify-between items-center border-b border-outline-variant/30">
+          <h3 class="font-headline-md text-headline-md font-bold text-on-surface">Agregar Nuevo Voluntario</h3>
+          <button 
+            (click)="closeModal()"
+            class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- Modal Body -->
+        <form [formGroup]="volunteerForm" (ngSubmit)="onSubmitVolunteer()" class="p-6 space-y-4">
+          <!-- Volunteer Name -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="v_nombre">Nombre Completo</label>
+            <input 
+              formControlName="nombre"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="v_nombre" 
+              placeholder="Ej. Ana Martínez" 
+              required>
+            @if (volunteerForm.get('nombre')?.touched && volunteerForm.get('nombre')?.invalid) {
+              <span class="text-xs text-error block">El nombre es requerido.</span>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="v_email">Correo Electrónico</label>
+            <input 
+              formControlName="email"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="v_email" 
+              placeholder="ana.martinez@email.com" 
+              type="email"
+              required>
+            @if (volunteerForm.get('email')?.touched && volunteerForm.get('email')?.invalid) {
+              <span class="text-xs text-error block">Ingrese un correo electrónico válido.</span>
+            }
+          </div>
+
+          <!-- Ciudad -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="v_ciudad">Ciudad</label>
+            <input 
+              formControlName="ciudad"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="v_ciudad" 
+              placeholder="Ej. Quito" 
+              required>
+            @if (volunteerForm.get('ciudad')?.touched && volunteerForm.get('ciudad')?.invalid) {
+              <span class="text-xs text-error block">La ciudad es requerida.</span>
+            }
+          </div>
+
+          <!-- Programa Asignado -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="v_prog">Programa Asignado</label>
+            <select 
+              formControlName="programaAsignado"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest text-secondary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              id="v_prog"
+              required>
+              <option value="" disabled selected>Seleccione un programa...</option>
+              <option value="Talleres de Oficios">Talleres de Oficios</option>
+              <option value="Brigadas Médicas">Brigadas Médicas</option>
+              <option value="Apoyo Psicológico">Apoyo Psicológico</option>
+              <option value="Evangelismo y Discipulado">Evangelismo y Discipulado</option>
+              <option value="Reinserción Laboral Esperanza">Reinserción Laboral Esperanza</option>
+            </select>
+            @if (volunteerForm.get('programaAsignado')?.touched && volunteerForm.get('programaAsignado')?.invalid) {
+              <span class="text-xs text-error block">Seleccione un programa.</span>
+            }
+          </div>
+
+          <!-- Actions -->
+          <footer class="pt-4 flex justify-end gap-3 border-t border-outline-variant/30 mt-6">
+            <button 
+              type="button" 
+              (click)="closeModal()"
+              class="px-5 py-2.5 border border-outline rounded-lg font-label-md text-label-md text-secondary hover:bg-surface-container transition-colors cursor-pointer">
+              Cancelar
+            </button>
+            <button 
+              type="submit"
+              [disabled]="volunteerForm.invalid"
+              class="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+              Agregar Voluntario
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Edit Bank Details Modal -->
+  @if (isBankModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-outline-variant/30 animate-scale-up">
+        <!-- Modal Header -->
+        <header class="bg-surface-container px-6 py-4 flex justify-between items-center border-b border-outline-variant/30">
+          <h3 class="font-headline-md text-headline-md font-bold text-on-surface">Editar Información Bancaria</h3>
+          <button 
+            (click)="closeBankModal()"
+            class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- Modal Body -->
+        <form [formGroup]="bankForm" (ngSubmit)="onSubmitBankDetails()" class="p-6 space-y-4">
+          <!-- Banco -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_banco">Nombre del Banco</label>
+            <input 
+              formControlName="banco"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_banco" 
+              placeholder="Ej. Banco Pichincha" 
+              required>
+            @if (bankForm.get('banco')?.touched && bankForm.get('banco')?.invalid) {
+              <span class="text-xs text-error block">El nombre del banco es requerido.</span>
+            }
+          </div>
+
+          <!-- Tipo de Cuenta -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_cuenta">Tipo de Cuenta</label>
+            <input 
+              formControlName="cuenta"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_cuenta" 
+              placeholder="Ej. Corriente" 
+              required>
+            @if (bankForm.get('cuenta')?.touched && bankForm.get('cuenta')?.invalid) {
+              <span class="text-xs text-error block">El tipo de cuenta es requerido.</span>
+            }
+          </div>
+
+          <!-- Número de Cuenta -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_numero">Número de Cuenta</label>
+            <input 
+              formControlName="numero"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_numero" 
+              placeholder="Ej. 2100XXXXXX" 
+              required>
+            @if (bankForm.get('numero')?.touched && bankForm.get('numero')?.invalid) {
+              <span class="text-xs text-error block">El número de cuenta es requerido.</span>
+            }
+          </div>
+
+          <!-- Titular de la Cuenta -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_titular">Titular de la Cuenta</label>
+            <input 
+              formControlName="titular"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_titular" 
+              placeholder="Ej. Fund. Confraternidad Carcelaria" 
+              required>
+            @if (bankForm.get('titular')?.touched && bankForm.get('titular')?.invalid) {
+              <span class="text-xs text-error block">El titular de la cuenta es requerido.</span>
+            }
+          </div>
+
+          <!-- RUC -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="b_ruc">RUC</label>
+            <input 
+              formControlName="ruc"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="b_ruc" 
+              placeholder="Ej. 179XXXXXXX001" 
+              required>
+            @if (bankForm.get('ruc')?.touched && bankForm.get('ruc')?.invalid) {
+              <span class="text-xs text-error block">El RUC es requerido.</span>
+            }
+          </div>
+
+          <!-- Actions -->
+          <footer class="pt-4 flex justify-end gap-3 border-t border-outline-variant/30 mt-6">
+            <button 
+              type="button" 
+              (click)="closeBankModal()"
+              class="px-5 py-2.5 border border-outline rounded-lg font-label-md text-label-md text-secondary hover:bg-surface-container transition-colors cursor-pointer">
+              Cancelar
+            </button>
+            <button 
+              type="submit"
+              [disabled]="bankForm.invalid"
+              class="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+              Guardar Cambios
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+</div>

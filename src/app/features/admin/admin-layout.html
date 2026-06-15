@@ -1,0 +1,58 @@
+<div class="bg-background text-on-background font-body-md antialiased min-h-screen flex">
+  <!-- SideNavBar -->
+  <nav class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-surface-container-low border-r border-outline-variant shadow-sm w-64">
+    <!-- Header -->
+    <div class="mb-8 px-4">
+      <h1 class="font-headline-md text-headline-md font-bold text-on-surface">Panel Admin</h1>
+      <p class="font-body-md text-label-md text-on-surface-variant mt-1">Fundación Confraternidad</p>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex-1 space-y-2">
+      <!-- Voluntarios / Datos -->
+      <a 
+        routerLink="/admin/dashboard/datos" 
+        routerLinkActive="bg-secondary-container text-on-secondary-container font-bold scale-95"
+        class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+        <span class="material-symbols-outlined">group</span>
+        <span class="font-label-md text-label-md">Voluntarios</span>
+      </a>
+
+      <!-- Donaciones -->
+      <a 
+        routerLink="/admin/dashboard/donaciones" 
+        routerLinkActive="bg-secondary-container text-on-secondary-container font-bold scale-95"
+        class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+        <span class="material-symbols-outlined">payments</span>
+        <span class="font-label-md text-label-md">Donaciones</span>
+      </a>
+
+      <!-- Programas -->
+      <a 
+        routerLink="/admin/dashboard/programas" 
+        routerLinkActive="bg-secondary-container text-on-secondary-container font-bold scale-95"
+        class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all">
+        <span class="material-symbols-outlined">assignment</span>
+        <span class="font-label-md text-label-md">Programas</span>
+      </a>
+    </div>
+
+    <!-- Footer / Settings & Logout -->
+    <div class="mt-auto border-t border-outline-variant pt-4 space-y-2">
+      <div class="px-4 py-1 text-xs text-on-surface-variant/70 overflow-hidden text-ellipsis whitespace-nowrap" [title]="userEmail() || ''">
+        {{ userEmail() }}
+      </div>
+      <button 
+        (click)="logout()"
+        class="w-full flex items-center justify-center gap-2 px-4 py-3 mt-2 text-primary font-label-md text-label-md border border-primary/20 rounded-lg hover:bg-primary-container/10 transition-colors cursor-pointer font-semibold">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Area where sub-dashboards render -->
+  <main class="flex-1 ml-64 min-h-screen bg-background flex flex-col">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,234 @@
+<div class="p-8 flex flex-col min-h-screen animate-fade-in-up">
+  <!-- Page Header -->
+  <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-background">Gestión de Programas</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1">Administre y monitoree el estado de los programas de la fundación.</p>
+    </div>
+    <button 
+      (click)="openModal()"
+      class="flex items-center gap-2 bg-primary-container text-on-primary-container font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-primary hover:text-white transition-colors shadow-sm hover:shadow-md cursor-pointer font-semibold">
+      <span class="material-symbols-outlined text-[20px]">add</span>
+      Crear Nuevo Programa
+    </button>
+  </header>
+
+  <!-- Filters / Search Bar -->
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-4 shadow-sm">
+    <div class="flex-1 flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-lg border border-transparent focus-within:border-primary-container focus-within:bg-surface-container-lowest transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">search</span>
+      <input 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/70 outline-none" 
+        placeholder="Buscar por nombre de programa o responsable...">
+    </div>
+    
+    <div class="flex items-center gap-2 overflow-x-auto">
+      <span class="text-sm font-semibold text-secondary whitespace-nowrap">Estado:</span>
+      <button 
+        (click)="onStatusFilterChange('all')"
+        [class.bg-secondary]="filterStatus() === 'all'"
+        [class.text-white]="filterStatus() === 'all'"
+        [class.bg-surface-container-low]="filterStatus() !== 'all'"
+        class="px-4 py-2 rounded-lg font-label-md text-xs transition-colors cursor-pointer">
+        Todos
+      </button>
+      <button 
+        (click)="onStatusFilterChange('Activo')"
+        [class.bg-secondary]="filterStatus() === 'Activo'"
+        [class.text-white]="filterStatus() === 'Activo'"
+        [class.bg-surface-container-low]="filterStatus() !== 'Activo'"
+        class="px-4 py-2 rounded-lg font-label-md text-xs transition-colors cursor-pointer">
+        Activos
+      </button>
+      <button 
+        (click)="onStatusFilterChange('Planificación')"
+        [class.bg-secondary]="filterStatus() === 'Planificación'"
+        [class.text-white]="filterStatus() === 'Planificación'"
+        [class.bg-surface-container-low]="filterStatus() !== 'Planificación'"
+        class="px-4 py-2 rounded-lg font-label-md text-xs transition-colors cursor-pointer">
+        En Planificación
+      </button>
+    </div>
+  </div>
+
+  <!-- Data Table Container -->
+  <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm overflow-hidden flex-1 flex flex-col">
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="w-full text-left border-collapse">
+        <!-- Table Header -->
+        <thead>
+          <tr class="bg-secondary text-on-secondary">
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30">Nombre del Programa</th>
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30">Responsable</th>
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30 text-right">Beneficiarios</th>
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30">Última Actividad</th>
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30 text-center">Estado</th>
+            <th class="py-4 px-6 font-headline-md text-label-md tracking-wider border-b border-outline-variant/30 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <!-- Table Body -->
+        <tbody class="font-body-md text-body-md text-on-surface divide-y divide-outline-variant/30">
+          @for (p of filteredPrograms(); track p.id) {
+            <tr class="hover:bg-surface-container-low/50 transition-colors">
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-primary">{{ getProgramIcon(p.nombre) }}</span>
+                  <span class="font-medium text-secondary">{{ p.nombre }}</span>
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs">
+                    {{ p.responsable.substring(0,2).toUpperCase() }}
+                  </div>
+                  <span>{{ p.responsable }}</span>
+                </div>
+              </td>
+              <td class="py-4 px-6 text-right font-semibold text-on-surface-variant">
+                {{ p.beneficiarios }}
+              </td>
+              <td class="py-4 px-6 text-on-surface-variant text-sm">
+                {{ p.ultimaActividad }}
+              </td>
+              <td class="py-4 px-6 text-center">
+                @if (p.estado === 'Activo') {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>
+                    Activo
+                  </span>
+                } @else if (p.estado === 'Planificación') {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                    Planificación
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-gray-700 border border-gray-200 text-xs font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+                    Inactivo
+                  </span>
+                }
+              </td>
+              <td class="py-4 px-6 text-right flex items-center justify-end gap-2">
+                <button 
+                  (click)="toggleProgramStatus(p)"
+                  [title]="p.estado === 'Activo' ? 'Inactivar Programa' : 'Activar Programa'"
+                  class="text-secondary hover:text-primary transition-colors p-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-[20px]">
+                    {{ p.estado === 'Activo' ? 'block' : 'check_circle' }}
+                  </span>
+                </button>
+                <button 
+                  (click)="deleteProgram(p.id)"
+                  title="Eliminar Programa"
+                  class="text-error hover:text-red-700 transition-colors p-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="py-8 text-center text-on-surface-variant">
+                No se encontraron programas con el criterio de búsqueda.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create Program Modal -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-outline-variant/30 animate-scale-up">
+        <!-- Modal Header -->
+        <header class="bg-surface-container px-6 py-4 flex justify-between items-center border-b border-outline-variant/30">
+          <h3 class="font-headline-md text-headline-md font-bold text-on-surface">Crear Nuevo Programa</h3>
+          <button 
+            (click)="closeModal()"
+            class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- Modal Body -->
+        <form [formGroup]="programForm" (ngSubmit)="onSubmitProgram()" class="p-6 space-y-4">
+          <!-- Program Name -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="p_nombre">Nombre del Programa</label>
+            <input 
+              formControlName="nombre"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="p_nombre" 
+              placeholder="Ej. Talleres de Carpintería" 
+              required>
+            @if (programForm.get('nombre')?.touched && programForm.get('nombre')?.invalid) {
+              <span class="text-xs text-error block">El nombre es requerido (mínimo 3 caracteres).</span>
+            }
+          </div>
+
+          <!-- Responsable -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="p_responsable">Responsable</label>
+            <input 
+              formControlName="responsable"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+              id="p_responsable" 
+              placeholder="Ej. Ing. Carlos Mendoza" 
+              required>
+            @if (programForm.get('responsable')?.touched && programForm.get('responsable')?.invalid) {
+              <span class="text-xs text-error block">El responsable es requerido.</span>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="p_desc">Descripción</label>
+            <textarea 
+              formControlName="descripcion"
+              rows="3"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" 
+              id="p_desc" 
+              placeholder="Describa el propósito y alcance del programa..." 
+              required></textarea>
+            @if (programForm.get('descripcion')?.touched && programForm.get('descripcion')?.invalid) {
+              <span class="text-xs text-error block">La descripción es requerida.</span>
+            }
+          </div>
+
+          <!-- Status -->
+          <div class="space-y-1">
+            <label class="block font-label-md text-label-md text-on-surface" for="p_estado">Estado Inicial</label>
+            <select 
+              formControlName="estado"
+              class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md bg-surface-container-lowest text-secondary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              id="p_estado"
+              required>
+              <option value="Activo">Activo</option>
+              <option value="Planificación">Planificación</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          </div>
+
+          <!-- Actions -->
+          <footer class="pt-4 flex justify-end gap-3 border-t border-outline-variant/30 mt-6">
+            <button 
+              type="button" 
+              (click)="closeModal()"
+              class="px-5 py-2.5 border border-outline rounded-lg font-label-md text-label-md text-secondary hover:bg-surface-container transition-colors cursor-pointer">
+              Cancelar
+            </button>
+            <button 
+              type="submit"
+              [disabled]="programForm.invalid"
+              class="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+              Crear Programa
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+</div>
