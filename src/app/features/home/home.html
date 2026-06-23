@@ -148,9 +148,11 @@
             "Llegué aquí sin esperanza, creyendo que mi vida había terminado. A través de los talleres bíblicos, encontré el perdón y la fuerza para cambiar. Hoy soy un hombre nuevo."
           </p>
           <div class="flex items-center gap-4 border-t border-surface-variant pt-4">
-            <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold">MO</div>
+            <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </div>
             <div>
-              <h5 class="font-label-md text-label-md font-bold text-on-surface">Miguel Ojeda</h5>
+              <h5 class="font-label-md text-label-md font-bold text-on-surface">Anónimo</h5>
               <span class="text-[12px] text-secondary">Interno, Prog. Discipulado</span>
             </div>
           </div>
@@ -161,9 +163,11 @@
             "Las brigadas médicas no solo curaron mis dolencias físicas, sino que me demostraron que aún hay personas afuera a las que les importamos. Ese cariño sana más que cualquier medicina."
           </p>
           <div class="flex items-center gap-4 border-t border-surface-variant pt-4">
-            <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold">PM</div>
+            <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </div>
             <div>
-              <h5 class="font-label-md text-label-md font-bold text-on-surface">Patricia Medina</h5>
+              <h5 class="font-label-md text-label-md font-bold text-on-surface">Anónima</h5>
               <span class="text-[12px] text-secondary">Interna, Centro Femenino</span>
             </div>
           </div>
@@ -174,9 +178,11 @@
             "Participar como voluntario me ha enseñado más de humildad y humanidad que cualquier otra experiencia. Ver la transformación en sus ojos es la mayor recompensa."
           </p>
           <div class="flex items-center gap-4 border-t border-surface-variant pt-4">
-            <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">FC</div>
+            <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </div>
             <div>
-              <h5 class="font-label-md text-label-md font-bold text-on-surface">Fernando Córdoba</h5>
+              <h5 class="font-label-md text-label-md font-bold text-on-surface">Anónimo</h5>
               <span class="text-[12px] text-secondary">Voluntario Activo</span>
             </div>
           </div>
@@ -272,6 +278,7 @@
                 <option value="Apoyo Psicológico">Apoyo Psicológico</option>
                 <option value="Talleres de Oficios">Talleres / Oficios</option>
                 <option value="Evangelismo y Discipulado">Apoyo Espiritual</option>
+                <option value="Ayuda Económica">Ayuda Económica</option>
               </select>
               @if (volunteerForm.get('programa')?.touched && volunteerForm.get('programa')?.invalid) {
                 <span class="text-xs text-error mt-1 block">Seleccione un área de interés.</span>

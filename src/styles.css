@@ -105,6 +105,9 @@
   .icon-fill {
     font-variation-settings: 'FILL' 1;
   }
+  p {
+    text-align: justify;
+  }
 }
 
 /* Custom Utilities */
